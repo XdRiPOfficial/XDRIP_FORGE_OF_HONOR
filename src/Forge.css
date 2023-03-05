@@ -88,6 +88,10 @@ button:focus {
   box-shadow: 1px 2px 3px 4px #174d83;
 }
 
+video {
+  cursor: pointer;
+}
+
 /* Forge button */
 .gradient-bg-button {
   font-size: 0.9rem;

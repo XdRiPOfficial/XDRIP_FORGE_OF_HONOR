@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ethers } from 'ethers';
 import Contract from '../contracts/Medals_Of_Honor.sol';
 import "../Forge.css";
+import ModalVideo from 'react-modal-video';
+import "react-modal-video/scss/modal-video.scss";
 import commonVideo from "../videos/common_video.mp4";
 import uncommonVideo from "../videos/uncommon_video.mp4";
 import rareVideo from "../videos/rare_video.mp4";
@@ -17,6 +19,9 @@ const Forge = () => {
   const signer = provider.getSigner();
   //const contractInstance = new ethers.Contract(contractAddress, contractABI, signer);
 
+  const [isOpen, setOpen] = useState(false);
+  const [videoId, setVideoId] = useState('');
+
   const nfts = [
     {
       id: 1,
@@ -24,6 +29,7 @@ const Forge = () => {
       creator: 'XDRIP OFFICIAL',
       price: '0.25 BNB',
       nft: commonVideo,
+      videoId: 'nWHNzR660TU'
     },
     {
       id: 2,
@@ -31,6 +37,7 @@ const Forge = () => {
       creator: 'XDRIP OFFICIAL',
       price: '0.50 BNB',
       nft: uncommonVideo,
+      videoId: '7w94uyo24g0'
     },
     {
       id: 3,
@@ -38,6 +45,7 @@ const Forge = () => {
       creator: 'XDRIP OFFICIAL',
       price: '0.75 BNB',
       nft: rareVideo,
+      videoId: 'jQG6tgMtLbk'
     },
     {
       id: 4,
@@ -45,6 +53,7 @@ const Forge = () => {
       creator: 'XDRIP OFFICIAL',
       price: '1.0 BNB',
       nft: epicVideo,
+      videoId: 't7psdW_7fZI'
     },
     {
       id: 5,
@@ -52,6 +61,7 @@ const Forge = () => {
       creator: 'XDRIP OFFICIAL',
       price: '1.5 BNB',
       nft: legendaryVideo,
+      videoId: 'e_Yr4s7fTTA'
     },
   ];
 
@@ -89,7 +99,7 @@ const Forge = () => {
           {nfts.map((nft) => (
             <div key={nft.id} className="border" >
               <div className="relative">
-                <video className="w-full h-full object-cover" src={nft.nft} autoPlay loop muted />
+                <video className="w-full h-full object-cover" title="Click to preview NFT" src={nft.nft} autoPlay loop muted onClick={() => { setOpen(true); setVideoId(nft.videoId); }} />
               </div>
               <div className="p-4">
                 <h4 className="mt-0 mb-0 text-2xl text-white">{nft.name}<br/>MEDAL</h4>
@@ -109,8 +119,9 @@ const Forge = () => {
           ))}
         </div>
       </div>
+      <ModalVideo channel='youtube' isOpen={isOpen} videoId={videoId} onClose={() => setOpen(false)} />
     </>
   );
-          } 
+};
 
 export default Forge;
