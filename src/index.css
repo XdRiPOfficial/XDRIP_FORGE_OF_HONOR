@@ -1,0 +1,19 @@
+@font-face {
+  font-family: 'Good Times';
+  src: url('./Fonts/good_times_rg.woff2') format('woff2'),
+       url('./Fonts/good_times_rg.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Global styles */
+
+body {
+  font-family: 'Good Times', sans-serif;
+  
+  
+
+}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

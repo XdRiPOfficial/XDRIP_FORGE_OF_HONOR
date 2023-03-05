@@ -1,0 +1,102 @@
+/* Set background color */
+body {
+  background-color: #000000;
+}
+
+
+/* Set container width and center content */
+.max-w-7xl {
+  margin: 0 auto;
+  max-width: 1700px;
+}
+
+/* Override padding for mobile */
+.sm\:px-6 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+/* Set spacing and alignment for grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(265px, 1fr));
+  grid-gap: 2rem;
+  justify-items: center;
+  align-items: top;
+}
+
+/* Set border for NFT container */
+.border {
+  border: 6px solid hwb(240 24% 75%);
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.082);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+}
+
+
+/* Set NFT info styles */
+.p-4 {
+  padding: .5rem;
+}
+
+h4 {
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 2rem;
+  /*font-weight: bold;*/
+  color: hwb(240 24% 75%);
+}
+
+h3 {
+  font-size: 1.5rem;
+  /*font-weight: bold;*/
+  color: hwb(240 24% 75%);
+}
+
+p {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: normal;
+  color: hwb(240 24% 75%);
+}
+
+/* Set button styles */
+button {
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  height: 3rem;
+  border: none;
+  border-radius: 4px;
+  background: linear-gradient(to right, #313435, #3960b3);
+  color: #ffffff;
+  font-size: 2rem;
+  /*font-weight: bold;*/
+  text-transform: uppercase;
+  text-shadow: 0 0 2px #000;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out !important;
+}
+
+button:hover {
+  background: linear-gradient(to right, #2800d8, #35558f);
+}
+
+button:focus {
+  outline: none;
+  box-shadow: 1px 2px 3px 4px #174d83;
+}
+
+/* Forge button */
+.gradient-bg-button {
+  font-size: 0.9rem;
+  color:#fff;
+}
+
+/* Forge button Mobile */
+@media (max-width: 609px) {
+  .gradient-bg-button {
+    font-size: 1rem;
+  }
+}
