@@ -138,18 +138,10 @@ contract MedalsOfHonor is ERC721URIStorage, Ownable, ReentrancyGuard {
     }
 
     event CommonMinted(address indexed owner, uint256 tokenId, string ipfsHash);
-    event UncommonMinted(
-        address indexed owner,
-        uint256 tokenId,
-        string ipfsHash
-    );
+    event UncommonMinted(address indexed owner, uint256 tokenId, string ipfsHash);
     event RareMinted(address indexed owner, uint256 tokenId, string ipfsHash);
     event EpicMinted(address indexed owner, uint256 tokenId, string ipfsHash);
-    event LegendaryMinted(
-        address indexed owner,
-        uint256 tokenId,
-        string ipfsHash
-    );
+    event LegendaryMinted(address indexed owner, uint256 tokenId, string ipfsHash);
 
     Percentages public percentages = Percentages(20, 40, 15, 15, 10);
 
@@ -363,6 +355,8 @@ contract MedalsOfHonor is ERC721URIStorage, Ownable, ReentrancyGuard {
         uint256 giveawaysPercentage,
         uint256 teamPercentage
     ) public onlyOwner {
+        uint256 totalPercentage = xDripBuybacksPercentage + stakingRewardsPercentage + marketingPercentage + giveawaysPercentage + teamPercentage;
+        require(totalPercentage == 100, "Percentages must add up to 100");
         percentages = Percentages(
             xDripBuybacksPercentage,
             stakingRewardsPercentage,
@@ -392,37 +386,6 @@ contract MedalsOfHonor is ERC721URIStorage, Ownable, ReentrancyGuard {
         teamWallet.transfer((totalFunds * percentages.teamPercentage) / 100);
     }
 
-    function getCooldownDaysLeft(address account, uint256 mintTier)
-        public
-        view
-        returns (uint256)
-    {
-        require(mintTier > 0 && mintTier <= 5, "Invalid mint tier");
-        require(
-            _lastMintTimestamp[account][mintTier] > 0,
-            "No previous mints for this tier"
-        );
-        uint256 cooldownEnd = _lastMintTimestamp[account][mintTier] +
-            cooldownTimes[mintTier];
-        if (block.timestamp >= cooldownEnd) {
-            return 0;
-        }
-        return (cooldownEnd - block.timestamp) / 1 days;
-    }
-
-    function setAllCooldownTimes(
-        uint256 commonCooldown,
-        uint256 uncommonCooldown,
-        uint256 rareCooldown,
-        uint256 epicCooldown,
-        uint256 legendaryCooldown
-    ) public onlyOwner {
-        cooldownTimes[1] = commonCooldown;
-        cooldownTimes[2] = uncommonCooldown;
-        cooldownTimes[3] = rareCooldown;
-        cooldownTimes[4] = epicCooldown;
-        cooldownTimes[5] = legendaryCooldown;
-    }
 
     // @dev get ipfs, eligibility
     function getTokenIPFSHash(uint256 tokenId)
@@ -479,6 +442,44 @@ contract MedalsOfHonor is ERC721URIStorage, Ownable, ReentrancyGuard {
         marketingWallet = _marketingWallet;
         giveawaysWallet = _giveawaysWallet;
         teamWallet = _teamWallet;
+    }
+
+function getCooldownDaysLeft(address account, uint256 mintTier)
+        public
+        view
+        returns (uint256)
+    {
+        require(mintTier > 0 && mintTier <= 5, "Invalid mint tier");
+        require(
+            _lastMintTimestamp[account][mintTier] > 0,
+            "No previous mints for this tier"
+        );
+        uint256 cooldownEnd = _lastMintTimestamp[account][mintTier] +
+            cooldownTimes[mintTier];
+        if (block.timestamp >= cooldownEnd) {
+            return 0;
+        }
+        return (cooldownEnd - block.timestamp) / 1 days;
+    }
+
+    function setCommonCooldown(uint256 cooldown) public onlyOwner {
+        cooldownTimes[1] = cooldown;
+    }
+
+    function setUncommonCooldown(uint256 cooldown) public onlyOwner {
+        cooldownTimes[2] = cooldown;
+    }
+
+    function setRareCooldown(uint256 cooldown) public onlyOwner {
+        cooldownTimes[3] = cooldown;
+    }
+
+    function setEpicCooldown(uint256 cooldown) public onlyOwner {
+        cooldownTimes[4] = cooldown;
+    }
+
+    function setLegendaryCooldown(uint256 cooldown) public onlyOwner {
+        cooldownTimes[5] = cooldown;
     }
 
     function setCommonPrice(uint256 price) public onlyOwner {
