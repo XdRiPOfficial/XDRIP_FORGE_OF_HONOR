@@ -1,12 +1,20 @@
+Readme Overview
+
 # XDRIP_FORGE_OF_HONOR
 Medals of Honor Elite XdRiP NFT Collection
 
-This is a smart contract for managing the Medals of Honor Elite XdRiP NFT Collection. It is a multi-tiered and extremely limited collection of Elite NFTs. 
-The contract is written in Solidity and interacts with the Binance Smart Chain.
+This is a smart contract written in Solidity for managing an NFT collection called "Medals of Honor Elite XdRiP". The NFTs are multi-tiered and extremely limited in supply. The contract interacts with the Binance Smart Chain (BSC).
+
+Features
+    The contract uses OpenZeppelin libraries for ERC721 implementation, ownership management, and reentrancy guard.
+    The contract has several customizable parameters such as token supply, token prices, and mint cooldown times.
+    The contract has functions for minting NFTs of different tiers (common, uncommon, rare, epic, and legendary).
+    The contract distributes funds from minting to several wallets based on configurable percentage splits.
+    The contract has a function for retrieving IPFS hashes associated with NFT tokens.
+    The contract has functions for checking the eligibility of a user for minting a particular tier of token and how long until their cooldown period ends.
+    The contract also includes functions for editing the wallet addresses for receiving funds and updating token prices.
 
 Dependencies-
-This contract uses the following dependencies from the OpenZeppelin library:
-
     ERC721URIStorage.sol
     ERC721.sol
     Counters.sol
