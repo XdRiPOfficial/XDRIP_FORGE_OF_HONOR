@@ -5,7 +5,7 @@ Medals of Honor Elite XdRiP NFT Collection
 
 This is a smart contract written in Solidity for managing an NFT collection called "Medals of Honor". The NFTs are multi-tiered and extremely limited in supply. The contract interacts with the Binance Smart Chain (BSC).
 
-Features
+Features -
     The contract uses OpenZeppelin libraries for ERC721 implementation, ownership management, and reentrancy guard.
     The contract has several customizable parameters such as supply, prices, and mint cooldown times.
     The contract has functions for minting NFTs of different tiers (common, uncommon, rare, epic, and legendary).
