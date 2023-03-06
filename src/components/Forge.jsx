@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ethers } from 'ethers';
-import Contract from '../contracts/Medals_Of_Honor.sol';
+import Contract from '../contracts/MedalsOfHonor.sol';
 import "../Forge.css";
 import ModalVideo from 'react-modal-video';
 import "react-modal-video/scss/modal-video.scss";
