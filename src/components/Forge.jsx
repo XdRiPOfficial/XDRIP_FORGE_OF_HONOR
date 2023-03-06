@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { ethers } from 'ethers';
-import Contract from '../contracts/MedalsOfHonor.sol';
+import Web3 from 'web3';
+import contractAbi from '../abis/mohAbi.json';
 import "../Forge.css";
 import ModalVideo from 'react-modal-video';
 import "react-modal-video/scss/modal-video.scss";
@@ -12,12 +12,10 @@ import legendaryVideo from "../videos/legendary_video.mp4";
 
 
 const Forge = () => {
-  
-  const contractAddress = '0x...'; // insert address of contract here
-  //const contractABI = MyContract.abi; // insert the ABI here
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-  const signer = provider.getSigner();
-  //const contractInstance = new ethers.Contract(contractAddress, contractABI, signer);
+ const contractAddress = '0xa7f455976455F328D6E73D345E21B319bDe6A7b3';
+ const web3 = new Web3(window.BinanceChain);
+ //const medalsOfHonor = new web3.eth.Contract(contractAbi, contractAddress);
+ const ipfsHash = '/ipfs/QmTjjf1DRjdRWvuSsh5LGXVUi2AKTiTXbcH4a2oVxbouog/'; 
 
   const [isOpen, setOpen] = useState(false);
   const [videoId, setVideoId] = useState('');
@@ -29,7 +27,8 @@ const Forge = () => {
       creator: 'XDRIP OFFICIAL',
       price: '0.25 BNB',
       nft: commonVideo,
-      videoId: 'nWHNzR660TU'
+      videoId: 'nWHNzR660TU',
+      ipfsHash: '/ipfs/QmRmB8XKF39SPN6EPD9uqB5PbYZuQb3ZCbGyBvkp3iPapX?filename=COMMON.mp4'
     },
     {
       id: 2,
@@ -37,7 +36,8 @@ const Forge = () => {
       creator: 'XDRIP OFFICIAL',
       price: '0.50 BNB',
       nft: uncommonVideo,
-      videoId: '7w94uyo24g0'
+      videoId: '7w94uyo24g0',
+      ipfsHash: '/ipfs/QmejQNntRF55PdeJ8o3Kf5Yt7gYdibdQsbmzHYFY5FwfDx?filename=UNCOMMON.mp4'
     },
     {
       id: 3,
@@ -45,7 +45,8 @@ const Forge = () => {
       creator: 'XDRIP OFFICIAL',
       price: '0.75 BNB',
       nft: rareVideo,
-      videoId: 'jQG6tgMtLbk'
+      videoId: 'jQG6tgMtLbk',
+      ipfsHash: '/ipfs/QmVZQWfTpBJQKtAhdxE85uF3chUGF9aTFE2ZjAoRj2wKG7?filename=RARE.mp4'
     },
     {
       id: 4,
@@ -53,7 +54,8 @@ const Forge = () => {
       creator: 'XDRIP OFFICIAL',
       price: '1.0 BNB',
       nft: epicVideo,
-      videoId: 't7psdW_7fZI'
+      videoId: 't7psdW_7fZI',
+      ipfsHash: '/ipfs/QmcpkEPjttpwBoZPiuCyDtqj8WHpqSVfZv6xa2TRfR7rEU?filename=EPIC.mp4'
     },
     {
       id: 5,
@@ -61,36 +63,50 @@ const Forge = () => {
       creator: 'XDRIP OFFICIAL',
       price: '1.5 BNB',
       nft: legendaryVideo,
-      videoId: 'e_Yr4s7fTTA'
+      videoId: 'e_Yr4s7fTTA',
+      ipfsHash: '/ipfs/QmfNX1afjGa4WwYUZrv1SUhp5DkVBqZ9sPUkcSWYySfovx?filename=LEGENDARY.mp4'
     },
   ];
 
   const handleMint = async (nftId, nftName) => {
     // find the NFT with the matching ID
     const selectedNft = nfts.find(nft => nft.id === nftId);
-
+  
     // make sure the selected NFT exists
     if (!selectedNft) {
       console.error(`NFT with ID ${nftId} not found`);
       return;
     }
-
-    // prompt the user to confirm the purchase
+  
+    // Confirm the purchase
     const confirmed = window.confirm(`FORGE YOUR ${selectedNft.name} MEDAL FOR ${selectedNft.price}?`);
-
+  
     if (!confirmed) {
       return;
     }
-
+  
     // call the smart contract function to mint the NFT
     try {
-      const tx = await contractInstance.mintNFT();
-      await tx.wait();
+      // Prompt user to connect MetaMask
+      await window.ethereum.enable();
+  
+      // Get user's BSC address
+      const accounts = await web3.eth.getAccounts();
+      const userAddress = accounts[0];
+  
+      // Get the contract instance
+      const contract = new web3.eth.Contract(contractAbi, contractAddress);
+  
+      // Mint the NFT
+      const mintTx = await contract.methods.mintNFT(userAddress, ipfsHash, selectedNft.name).send({ from: userAddress, value: web3.utils.toWei(selectedNft.price, 'ether') });
+  
+      console.log(mintTx);
       console.log(`Minted NFT: ${selectedNft.name} (${nftName})`);
     } catch (error) {
       console.error(error);
     }
   };
+  
 
   return (
     <>

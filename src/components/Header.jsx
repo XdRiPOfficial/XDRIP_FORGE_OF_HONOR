@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ethers } from 'ethers';
+import Web3 from 'web3';
 import detectEthereumProvider from '@metamask/detect-provider';
 import headerLogo from "../images/headerLogo.png";
 import '../Header.css';
@@ -9,20 +9,20 @@ const Header = () => {
   const [walletType, setWalletType] = useState(null);
 
   useEffect(() => {
-    const getConnectedAddress = async () => {y
+    const getConnectedAddress = async () => {
       try {
         const provider = await detectEthereumProvider();
         if (provider && provider.isMetaMask) {
           setWalletType('MetaMask');
-          const signer = new ethers.providers.Web3Provider(provider).getSigner();
-          const connectedAddress = await signer.getAddress();
-          setAddress(connectedAddress);
+          const web3 = new Web3(provider);
+          const accounts = await web3.eth.getAccounts();
+          setAddress(accounts[0]);
         } else if (window.ethereum && window.ethereum.isTrust) {
           setWalletType('Trust Wallet');
           await window.ethereum.request({ method: 'eth_requestAccounts' });
-          const signer = new ethers.providers.Web3Provider(window.ethereum).getSigner();
-          const connectedAddress = await signer.getAddress();
-          setAddress(connectedAddress);
+          const web3 = new Web3(window.ethereum);
+          const accounts = await web3.eth.getAccounts();
+          setAddress(accounts[0]);
         } else {
           console.log('Please install MetaMask or Trust Wallet');
         }
@@ -37,16 +37,16 @@ const Header = () => {
     try {
       const provider = await detectEthereumProvider();
       if (provider && provider.isMetaMask) {
-        await provider.request({ method: 'eth_requestAccounts' });
-        const signer = new ethers.providers.Web3Provider(provider).getSigner();
-        const connectedAddress = await signer.getAddress();
-        setAddress(connectedAddress);
+        const web3 = new Web3(provider);
+        await web3.eth.requestAccounts();
+        const accounts = await web3.eth.getAccounts();
+        setAddress(accounts[0]);
         setWalletType('MetaMask');
       } else if (window.ethereum && window.ethereum.isTrust) {
         await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const signer = new ethers.providers.Web3Provider(window.ethereum).getSigner();
-        const connectedAddress = await signer.getAddress();
-        setAddress(connectedAddress);
+        const web3 = new Web3(window.ethereum);
+        const accounts = await web3.eth.getAccounts();
+        setAddress(accounts[0]);
         setWalletType('Trust Wallet');
       } else {
         console.log('Please install MetaMask or Trust Wallet');
