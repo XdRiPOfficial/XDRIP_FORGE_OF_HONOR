@@ -48,9 +48,13 @@ The contract includes several internal functions for distributing funds, determi
 External Functions - 
 The contract includes several external functions for updating wallet addresses and NFT prices.
 
+Conclusion:
+The "Medals of Honor Elite XdRiP NFT Collection" smart contract is a complex contract that manages the XdRiP XRP reward token NFTs gallery. The contract is designed to ensure the correct distribution of funds and the minting of tokens for each tier. Additionally, the smart contract provides transparency and security to ensure the safety of the contract users.
+
+Authors - 
+The XdRiP Medal of Honor Collection NFT smart contract was written in its entirety by the XdRiP development team 
+
 Disclaimer - 
 This smart contract interacts with the Binance Smart Chain. All cryptocurrency transactions carry inherent risk. 
 Use this contract and associated dApps at your own risk.
 
-Authors - 
-The XdRiP Medal of Honor Collection NFT smart contract was written in its entirety by the XdRiP development team 
