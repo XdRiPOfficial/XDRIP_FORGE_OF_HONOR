@@ -7,12 +7,12 @@ This is a smart contract written in Solidity for managing an NFT collection call
 
 Features
     The contract uses OpenZeppelin libraries for ERC721 implementation, ownership management, and reentrancy guard.
-    The contract has several customizable parameters such as token supply, token prices, and mint cooldown times.
+    The contract has several customizable parameters such as supply, prices, and mint cooldown times.
     The contract has functions for minting NFTs of different tiers (common, uncommon, rare, epic, and legendary).
     The contract distributes funds from minting to several wallets based on configurable percentage splits.
-    The contract has a function for retrieving IPFS hashes associated with NFT tokens.
-    The contract has functions for checking the eligibility of a user for minting a particular tier of token and how long until their cooldown period ends.
-    The contract also includes functions for editing the wallet addresses for receiving funds and updating token prices.
+    The contract has a function for retrieving IPFS hashes associated with NFTs.
+    The contract has functions for checking the eligibility of a user for minting a particular tier and how long until their cooldown period ends.
+    The contract also includes functions for editing the wallet addresses for receiving funds and updating prices.
 
 Dependencies-
     ERC721URIStorage.sol
