@@ -53,4 +53,4 @@ This smart contract interacts with the Binance Smart Chain. All cryptocurrency t
 Use this contract and associated dApps at your own risk.
 
 Authors - 
-The XdRiP Medal of Honor Collection NFT smart contract was written by Jim C OG and OG Brad & team
+The XdRiP Medal of Honor Collection NFT smart contract was written in its entirety by the XdRiP development team 
