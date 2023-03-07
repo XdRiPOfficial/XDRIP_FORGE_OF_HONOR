@@ -10,52 +10,65 @@ const Header = () => {
 
   useEffect(() => {
     const getConnectedAddress = async () => {
-      try {
-        const provider = await detectEthereumProvider();
-        if (provider && provider.isMetaMask) {
-          setWalletType('MetaMask');
-          const web3 = new Web3(provider);
-          const accounts = await web3.eth.getAccounts();
-          setAddress(accounts[0]);
-        } else if (window.ethereum && window.ethereum.isTrust) {
-          setWalletType('Trust Wallet');
-          await window.ethereum.request({ method: 'eth_requestAccounts' });
-          const web3 = new Web3(window.ethereum);
-          const accounts = await web3.eth.getAccounts();
-          setAddress(accounts[0]);
-        } else {
-          console.log('Please install MetaMask or Trust Wallet');
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    getConnectedAddress();
-  }, []);
+  try {
+    let provider;
+    if (window.ethereum) {
+      provider = window.ethereum;
+    } else if (window.BinanceChain) {
+      provider = window.BinanceChain;
+    } else {
+      console.log('Please install Metamask, Binance Chain Wallet or Trust Wallet');
+      return;
+    }
+
+    await provider.request({ method: 'eth_requestAccounts' });
+    const web3 = new Web3(provider);
+    let accounts;
+    if (window.ethereum && window.ethereum.isMetaMask) {
+      setWalletType('MetaMask');
+      accounts = await web3.eth.getAccounts();
+    } else if (window.ethereum && window.ethereum.isTrust) {
+      setWalletType('Trust Wallet');
+      accounts = await web3.eth.getAccounts();
+    } else {
+      console.log('Please install MetaMask or Trust Wallet');
+      return;
+    }
+
+    setAddress(accounts[0]);
+  } catch (err) {
+    console.error(err);
+  }
+};
+getConnectedAddress();
+}, []);
 
   const connectWallet = async () => {
-    try {
-      const provider = await detectEthereumProvider();
-      if (provider && provider.isMetaMask) {
-        const web3 = new Web3(provider);
-        await web3.eth.requestAccounts();
-        const accounts = await web3.eth.getAccounts();
-        setAddress(accounts[0]);
-        setWalletType('MetaMask');
-      } else if (window.ethereum && window.ethereum.isTrust) {
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const web3 = new Web3(window.ethereum);
-        const accounts = await web3.eth.getAccounts();
-        setAddress(accounts[0]);
-        setWalletType('Trust Wallet');
-      } else {
-        console.log('Please install MetaMask or Trust Wallet');
-      }
-    } catch (err) {
-      console.error(err);
+  try {
+    let provider;
+    if (window.ethereum) {
+      provider = window.ethereum;
+    } else if (window.BinanceChain) {
+      provider = window.BinanceChain;
+    } else {
+      alert('Please install Metamask, Binance Chain Wallet or Trust Wallet and connect to Binance Smart Chain');
+      return;
     }
-  };
-
+    await provider.request({ method: 'eth_requestAccounts' });
+    const web3 = new Web3(provider);
+    const accounts = await web3.eth.getAccounts();
+    setAddress(accounts[0]);
+    if (window.ethereum && window.ethereum.isMetaMask) {
+      setWalletType('MetaMask');
+    } else if (window.ethereum && window.ethereum.isTrust) {
+      setWalletType('Trust Wallet');
+    } else if (window.BinanceChain) {
+      setWalletType('Binance Chain Wallet');
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
   const getShortenedAddress = () => {
     if (address) {
       const firstFourChars = address.substring(0, 4);
