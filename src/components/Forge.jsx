@@ -1,191 +1,336 @@
 import React, { useState } from 'react';
 import Web3 from 'web3';
 import contractABI from '../abis/mohAbi.json';
-import "../Forge.css";
-import ModalVideo from 'react-modal-video';
-import "react-modal-video/scss/modal-video.scss";
-import commonVideo from "../videos/common_video.mp4";
-import uncommonVideo from "../videos/uncommon_video.mp4";
-import rareVideo from "../videos/rare_video.mp4";
-import epicVideo from "../videos/epic_video.mp4";
-import legendaryVideo from "../videos/legendary_video.mp4";
+import { Button, Input, Typography } from 'antd';
+import detectEthereumProvider from '@metamask/detect-provider';
+
+
+const { XDRIP STUFF } = Typography;
 
 const mohContractABI = contractABI;
-const mohContractAddress = '0xa7f455976455F328D6E73D345E21B319bDe6A7b3'; 
+const mohContractAddress = '0xaF0B5f4d9F777fb4CAC449ff6F759e4979d184d4';
 
-const Forge = () => {
-  const [contractInstance, setContractInstance] = useState({});
-  const [isOpen, setOpen] = useState(false);
-  const [videoId, setVideoId] = useState('');
+const OwnerFunctions = () => {
+  const [contractInstance, setContractInstance] = useState(null);
   const [isWeb3Installed, setIsWeb3Installed] = useState(!!(window.ethereum || window.BinanceChain));
+  const [isOwner, setIsOwner] = useState(false);
+  const [commonPrice, setCommonPrice] = useState('');
+  const [uncommonPrice, setUncommonPrice] = useState('');
+  const [rarePrice, setRarePrice] = useState('');
+  const [epicPrice, setEpicPrice] = useState('');
+  const [legendaryPrice, setLegendaryPrice] = useState('');
+  const [xdripbuybackWallet, setXdripbuybackWallet] = useState('');
+  const [stakingRewardsWallet, setStakingRewardsWallet] = useState('');
+  const [marketingWallet, setMarketingWallet] = useState('');
+  const [giveawaysWallet, setGiveawaysWallet] = useState('');
+  const [teamWallet, setTeamWallet] = useState('');
+  const [commonCooldown, setCommonCooldown] = useState('');
+  const [uncommonCooldown, setUncommonCooldown] = useState('');
+  const [rareCooldown, setRareCooldown] = useState('');
+  const [epicCooldown, setEpicCooldown] = useState('');
+  const [legendaryCooldown, setLegendaryCooldown] = useState('');
+  const [xDripBuybacksPercentage, setXDripBuybacksPercentage] = useState('');
+  const [stakingRewardsPercentage, setStakingRewardsPercentage] = useState('');
+  const [marketingPercentage, setMarketingPercentage] = useState('');
+  const [giveawaysPercentage, setGiveawaysPercentage] = useState('');
+  const [teamPercentage, setTeamPercentage] = useState('');
 
   const handleConnectWallet = async () => {
-  try {
-    let provider;
-    if (window.ethereum) {
-      provider = new Web3(window.ethereum);
-    } else if (window.BinanceChain) {
-      provider = new Web3(window.BinanceChain);
-    } else {
-      alert('Please install Metamask or Binance Chain Wallet and connect to Binance Smart Chain');
-      return;
+    try {
+      const provider = await detectEthereumProvider();
+      if (!provider) {
+        alert('Please install MetaMask, Trust Wallet, or Binance Chain Wallet');
+        return;
+      }
+
+      await provider.request({ method: 'eth_requestAccounts' });
+      const web3 = new Web3(provider);
+      const accounts = await web3.eth.getAccounts();
+      const contractInstance = new web3.eth.Contract(mohContractABI, mohContractAddress);
+      setContractInstance(contractInstance);
+
+      // Check if the connected account is the owner
+      const owner = await contractInstance.methods.owner().call();
+      setIsOwner(owner === accounts[0]);
+    } catch (error) {
+      console.error(error);
     }
+  };
 
-    const accounts = await provider.eth.requestAccounts();
-    const contractInstance = new provider.eth.Contract(mohContractABI, mohContractAddress);
-    setContractInstance(contractInstance);
-
-    // Add event listener for "click" event on NFT cards
-    const nftCards = document.querySelectorAll('.nft-card');
-    nftCards.forEach(card => {
-      card.addEventListener('click', () => {
-        // Get the NFT ID and name from the card
-        const nftId = card.getAttribute('data-nft-id');
-        const nftName = card.getAttribute('data-nft-name');
-
-        // Call the handleMint function with the NFT ID, name, and accounts
-//        handleMint(nftId, nftName, accounts);
-      });
-    });
-
-    // handle web3 actions with the provider and contractInstance
+const updatePercentages = async () => {
+  try {
+    const options = { from: await contractInstance.methods.owner().call() };
+    await contractInstance.methods.setPercentages(
+      parseInt(xDripBuybacksPercentage),
+      parseInt(stakingRewardsPercentage),
+      parseInt(marketingPercentage),
+      parseInt(giveawaysPercentage),
+      parseInt(teamPercentage)
+    ).send(options);
+    console.log('Distribution percentages updated successfully');
   } catch (error) {
     console.error(error);
-    alert('Error connecting to wallet. Please allow access to your wallet and try again.');
-    return;
   }
 }
 
-  const handleMint = async (nftId, nftName, accounts) => {
-  if (!contractInstance) {
-    console.error('Contract instance not found');
-    return;
-  }
-
-  // find the NFT id
-  const selectedNft = nfts.find(nft => nft.id === nftId);
-
-  // make sure the selected NFT exists
-  if (!selectedNft) {
-    console.error(`NFT with ID ${nftId} not found`);
-    return;
-  }
-
-  // Confirm the purchase
-  const confirmed = window.confirm(`FORGE YOUR ${selectedNft.name} MEDAL FOR ${selectedNft.price}?`);
-
-  if (!confirmed) {
-    return;
-  }
-
-  // call the smart contract function to mint the NFT based on the NFT's name
+const updateCommonPrice = async () => {
   try {
-    let tx;
-switch (selectedNft.name) {
-  case 'COMMON':
-    tx = await contractInstance.methods.mintCommon('ipfs://QmRmB8XKF39SPN6EPD9uqB5PbYZuQb3ZCbGyBvkp3iPapX/COMMON.mp4').send({ from: accounts[0] });
-    break;
-  case 'UNCOMMON':
-    tx = await contractInstance.methods.mintUncommon('ipfs://QmejQNntRF55PdeJ8o3Kf5Yt7gYdibdQsbmzHYFY5FwfDx/UNCOMMON.mp4').send({ from: accounts[0] });
-    break;
-  case 'RARE':
-    tx = await contractInstance.methods.mintRare('ipfs://QmVZQWfTpBJQKtAhdxE85uF3chUGF9aTFE2ZjAoRj2wKG7/RARE.mp4').send({ from: accounts[0] });
-    break;
-  case 'EPIC':
-  tx = await contractInstance.methods.mintEpic('ipfs://QmcpkEPjttpwBoZPiuCyDtqj8WHpqSVfZv6xa2TRfR7rEU/EPIC.mp4').send({ from: accounts[0] });
-  break;
-case 'LEGENDARY':
-  tx = await contractInstance.methods.mintLegendary('ipfs://QmfNX1afjGa4WwYUZrv1SUhp5DkVBqZ9sPUkcSWYySfovx/LEGENDARY.mp4').send({ from: accounts[0] });
-  break;
-default:
-  console.error(`Unknown NFT name: ${selectedNft.name}`);
-  return;
-}
+    const options = { from: await contractInstance.methods.owner().call() };
+    const tx = await contractInstance.methods.setCommonPrice(uncommonPrice).send(options);
+    console.log('Transaction hash:', tx.transactionHash);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
-console.log(`Minted NFT: ${selectedNft.name} (${nftName})`);
-} catch (error) {
-  console.error(error);
-}
+const updateUncommonPrice = async () => {
+  try {
+    const options = { from: await contractInstance.methods.owner().call() };
+    const tx = await contractInstance.methods.setUncommonPrice(uncommonPrice).send(options);
+    console.log('Transaction hash:', tx.transactionHash);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const updateRarePrice = async () => {
+  try {
+    const options = { from: await contractInstance.methods.owner().call() };
+    const tx = await contractInstance.methods.setRarePrice(rarePrice).send(options);
+    console.log('Transaction hash:', tx.transactionHash);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const updateEpicPrice = async () => {
+  try {
+    const options = { from: await contractInstance.methods.owner().call() };
+    const tx = await contractInstance.methods.setEpicPrice(epicPrice).send(options);
+    console.log('Transaction hash:', tx.transactionHash);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const updateLegendaryPrice = async () => {
+  try {
+    const options = { from: await contractInstance.methods.owner().call() };
+    const tx = await contractInstance.methods.setLegendaryPrice(legendaryPrice).send(options);
+    console.log('Transaction hash:', tx.transactionHash);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const updateXdripbuybackWallet = async () => {
+  try {
+    const options = { from: await contractInstance.methods.owner().call() };
+    const tx = await contractInstance.methods.setXdripbuybackWallet(xdripbuybackWallet).send(options);
+    console.log('Transaction hash:', tx.transactionHash);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const updateStakingRewardsWallet = async () => {
+  try {
+    const options = { from: await contractInstance.methods.owner().call() };
+    const tx = await contractInstance.methods.setStakingRewardsWallet(stakingRewardsWallet).send(options);
+    console.log('Transaction hash:', tx.transactionHash);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const updateMarketingWallet = async () => {
+  try {
+    const options = { from: await contractInstance.methods.owner().call() };
+    const tx = await contractInstance.methods.setMarketingWallet(marketingWallet).send(options);
+    console.log('Transaction hash:', tx.transactionHash);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const updateGiveawaysWallet = async () => {
+  try {
+    const options = { from: await contractInstance.methods.owner().call() };
+    const tx = await contractInstance.methods.setGiveawaysWallet(giveawaysWallet).send(options);
+    console.log('Transaction hash:', tx.transactionHash);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const updateTeamWallet = async () => {
+  try {
+    const options = { from: await contractInstance.methods.owner().call() };
+    const tx = await contractInstance.methods.setTeamWallet(teamWallet).send(options);
+    console.log('Transaction hash:', tx.transactionHash);
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 
-const nfts = [
-  {
-    id: 0,
-    name: 'COMMON',
-    creator: 'XDRIP OFFICIAL',
-    price: '0.25 BNB',
-    nft: commonVideo,
-    videoId: 'nWHNzR660TU'
-  },
-  {
-    id: 1,
-    name: 'UNCOMMON',
-    creator: 'XDRIP OFFICIAL',
-    price: '0.50 BNB',
-    nft: uncommonVideo,
-    videoId: '7w94uyo24g0'
-  },
-  {
-    id: 2,
-    name: 'RARE',
-    creator: 'XDRIP OFFICIAL',
-    price: '0.75 BNB',
-    nft: rareVideo,
-    videoId: 'jQG6tgMtL'
-  },
-  {
-    id: 3,
-    name: 'EPIC',
-    creator: 'XDRIP OFFICIAL',
-    price: '1.0 BNB',
-    nft: epicVideo,
-    videoId: 't7psdW_'
 
-
-},
-{
-  id: 4,
-  name: 'LEGENDARY',
-  creator: 'XDRIP OFFICIAL',
-  price: '1.5 BNB',
-  nft: legendaryVideo,
-  videoId: 'e_Yr4s7fTTA'
-},
-
-];
-
-  return (
-  <>
-    <div className="max-w-7xl mx-auto py-10 px-0 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-1 gap-20 md:grid-cols-2 lg:grid-cols-2">
-        {nfts.map((nft) => (
-          <div key={nft.id} className="border nft-card" data-nft-id={nft.id} data-nft-name={nft.name} onClick={() => handleMint(nft.id, nft.name)}>
-            <div className="relative">
-              <video className="w-full h-full object-cover" title="Click to preview NFT" src={nft.nft} autoPlay loop muted onClick={() => { setOpen(true); setVideoId(nft.videoId); }} />
-            </div>
-            <div className="p-4">
-              <h4 className="mt-0 mb-0 text-2xl text-white">{nft.name}<br/>MEDAL</h4>
-              <p className="text-sm text-white mb-0">Presented By</p>
-              <h3 className="text-sm text-white mb-12">{nft.creator}</h3>              
-              <p className="mt- text-md text-white">{nft.price}</p>
-            <button 
-        className="mt-4 w-full inline-flex justify-center border px-4 py-2 
-        gradient-bg-button text-base text-black hover:from-blue-400 hover:to-purple-400 focus:outline-none 
-        focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" 
-        onClick={() => handleMint(nft.id, nft.name, accounts)}
-     >
-             FORGE YOUR MEDAL
-          </button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-    <ModalVideo channel='youtube' isOpen={isOpen} videoId={videoId} onClose={() => setOpen(false)} />
-  </>
-)
+const updateCommonCooldown = async () => {
+  try {
+    const options = { from: await contractInstance.methods.owner().call() };
+    const tx = await contractInstance.methods.setCommonCooldown(commonCooldown).send(options);
+    console.log('Transaction hash:', tx.transactionHash);
+  } catch (error) {
+    console.error(error);
+  }
 };
 
-export default Forge;
+const updateUncommonCooldown = async () => {
+  try {
+    const options = { from: await contractInstance.methods.owner().call() };
+    const tx = await contractInstance.methods.setUncommonCooldown(uncommonCooldown).send(options);
+    console.log('Transaction hash:', tx.transactionHash);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
+const updateRareCooldown = async () => {
+  try {
+    const options = { from: await contractInstance.methods.owner().call() };
+    const tx = await contractInstance.methods.setRareCooldown(rareCooldown).send(options);
+    console.log('Transaction hash:', tx.transactionHash);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const updateEpicCooldown = async () => {
+  try {
+    const options = { from: await contractInstance.methods.owner().call() };
+    const tx = await contractInstance.methods.setEpicCooldown(epicCooldown).send(options);
+    console.log('Transaction hash:', tx.transactionHash);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const updateLegendaryCooldown = async () => {
+  try {
+    const options = { from: await contractInstance.methods.owner().call() };
+    const tx = await contractInstance.methods.setLegendaryCooldown(legendaryCooldown).send(options);
+    console.log('Transaction hash:', tx.transactionHash);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+return (
+  <div>
+    {isWeb3Installed ? (
+      <>
+        {isOwner ? (
+          <>
+          
+            <Typography.Title level={2}>Update Mint Price</Typography.Title>
+            <Input type="number" placeholder="Common Price" onChange={(e) => setCommonPrice(e.target.value)} />
+            <Button type="primary" onClick={updateCommonPrice}>Update Common Price</Button>
+            
+            <Input type="number" placeholder="Uncommon Price" onChange={(e) => setUncommonPrice(e.target.value)} />
+            <Button type="primary" onClick={updateUncommonPrice}>Update Uncommon Price</Button>
+
+            <Input type="number" placeholder="Rare Price" onChange={(e) => setRarePrice(e.target.value)} />
+            <Button type="primary" onClick={updateRarePrice}>Update Rare Price</Button>
+
+            <Input type="number" placeholder="Epic Price" onChange={(e) => setEpicPrice(e.target.value)} />
+            <Button type="primary" onClick={updateEpicPrice}>Update Epic Price</Button>
+            
+            <Input type="number" placeholder="Legendary Price" onChange={(e) => setLegendaryPrice(e.target.value)} />
+            <Button type="primary" onClick={updateLegendaryPrice}>Update Legendary Price</Button>
+
+            <Typography.Title level={2}>Update Distribution Percentages</Typography.Title>          
+            <Input type="number" placeholder="xDrip Buybacks Percentage" onChange={(e) => setXDripBuybacksPercentage(e.target.value)} />
+            <Input type="number" placeholder="Staking Rewards Percentage" onChange={(e) => setStakingRewardsPercentage(e.target.value)} />
+            <Input type="number" placeholder="Marketing Percentage" onChange={(e) => setMarketingPercentage(e.target.value)} />
+            <Input type="number" placeholder="Giveaways Percentage" onChange={(e) => setGiveawaysPercentage(e.target.value)} />
+            <Input type="number" placeholder="Team Percentage" onChange={(e) => setTeamPercentage(e.target.value)} />
+            <Button type="primary" onClick={updatePercentages}>Update Percentages</Button>
+
+            <Typography.Title level={2}>Update Cooldown Times</Typography.Title>
+            <Input type="number" placeholder="Common Cooldown" onChange={(e) => setCommonCooldown(e.target.value)} />
+            <Button type="primary" onClick={updateCommonCooldown}>Update Common Cooldown</Button>
+
+            <Input type="number" placeholder="Uncommon Cooldown" onChange={(e) => setUncommonCooldown(e.target.value)} />
+            <Button type="primary" onClick={updateUncommonCooldown}>Update Uncommon Cooldown</Button>
+
+            <Input type="number" placeholder="Rare Cooldown" onChange={(e) => setRareCooldown(e.target.value)} />
+            <Button type="primary" onClick={updateRareCooldown}>Update Rare Cooldown</Button>
+
+            <Input type="number" placeholder="Epic Cooldown" onChange={(e) => setEpicCooldown(e.target.value)} />
+<Button type="primary" onClick={updateEpicCooldown}>Update Epic Cooldown</Button>
+
+<Input type="number" placeholder="Legendary Cooldown" onChange={(e) => setLegendaryCooldown(e.target.value)} />
+<Button type="primary" onClick={updateLegendaryCooldown}>Update Legendary Cooldown</Button>
+
+<Typography.Title level={2}>Update Wallet Addresses</Typography.Title>
+<Input type="text" placeholder="xDrip Buybacks Wallet" onChange={(e) => setXdripbuybackWallet(e.target.value)} />
+<Button type="primary" onClick={updateXdripbuybackWallet}>Update xDrip Buybacks Wallet</Button>
+
+<Input type="text" placeholder="Staking Rewards Wallet" onChange={(e) => setStakingRewardsWallet(e.target.value)} />
+<Button type="primary" onClick={updateStakingRewardsWallet}>Update Staking Rewards Wallet</Button>
+
+<Input type="text" placeholder="Marketing Wallet" onChange={(e) => setMarketingWallet(e.target.value)} />
+<Button type="primary" onClick={updateMarketingWallet}>Update Marketing Wallet</Button>
+
+<Input type="text" placeholder="Giveaways Wallet" onChange={(e) => setGiveawaysWallet(e.target.value)} />
+<Button type="primary" onClick={updateGiveawaysWallet}>Update Giveaways Wallet</Button>
+
+<Input type="text" placeholder="Team Wallet" onChange={(e) => setTeamWallet(e.target.value)} />
+<Button type="primary" onClick={updateTeamWallet}>Update Team Wallet</Button>
+</div>
+);
+};
+
+
+
+
+return (
+  <div>
+    {isWeb3Installed ? (
+      <>
+        {isOwner ? (
+          <>
+            <Typography.Title level={2}>Update Distribution Percentages</Typography.Title>
+            <Input type="number" placeholder="xDrip Buybacks Percentage" onChange={(e) => setXDripBuybacksPercentage(e.target.value)} />
+            <Input type="number" placeholder="Staking Rewards Percentage" onChange={(e) => setStakingRewardsPercentage(e.target.value)} />
+            <Input type="number" placeholder="Marketing Percentage" onChange={(e) => setMarketingPercentage(e.target.value)} />
+            <Input type="number" placeholder="Giveaways Percentage" onChange={(e) => setGiveawaysPercentage(e.target.value)} />
+            <Input type="number" placeholder="Team Percentage" onChange={(e) => setTeamPercentage(e.target.value)} />
+            <Button type="primary" onClick={updatePercentages}>Update Percentages</Button>
+
+            <Typography.Title level={2}>Update Cooldown Times</Typography.Title>
+            <Input type="number" placeholder="Common Cooldown" onChange={(e) => setCommonCooldown(e.target.value)} />
+            <Button type="primary" onClick={updateCommonCooldown}>Update Common Cooldown</Button>
+
+            <Input type="number" placeholder="Uncommon Cooldown" onChange={(e) => setUncommonCooldown(e.target.value)} />
+            <Button type="primary" onClick={updateUncommonCooldown}>Update Uncommon Cooldown</Button>
+
+            <Input type="number" placeholder="Rare Cooldown" onChange={(e) => setRareCooldown(e.target.value)} />
+            <Button type="primary" onClick={updateRareCooldown}>Update Rare Cooldown</Button>
+
+            <Input type="number" placeholder="Epic Cooldown" onChange={(e) => setEpicCooldown(e.target.value)} />
+
+
+
+          </>
+        ) : (
+          <Typography.Title level={2}>You are not the owner of this contract</Typography.Title>
+        )}
+      </>
+    ) : (
+      <Button type="primary" onClick={handleConnectWallet}>Connect Wallet</Button>
+    )}
+  </div>
+);
+
+export default OwnerFunctions;
